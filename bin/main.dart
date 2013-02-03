@@ -5,12 +5,15 @@ _send404(HttpResponse response) {
   response.outputStream.close();
 }
 
-startServer(String basePath) {
+startServer(String basePath, String ip, int port) {
   var server = new HttpServer();
-  server.listen('127.0.0.1', 8080);
+  server.listen(ip, port);
+  print('Server started on: http://$ip:$port');
   server.defaultRequestHandler = (HttpRequest request, HttpResponse response) {
+    print("Request: ${request.path}");
     final String path = request.path == '/' ? '/index.html' : request.path;
     final File file = new File('${basePath}${path}');
+    print("File: $file");
     file.exists().then((bool found) {
       if (found) {
         file.fullPath().then((String fullPath) {
@@ -28,10 +31,16 @@ startServer(String basePath) {
 }
 
 main() {
-  File script = new File(new Options().script);
-  script.directory().then((Directory d) {
-    print("Lauching Web Server, rendering files from $d");
-    startServer(d.path);
+  List<String> args = new Options().arguments;
+  if(args.length == 3) {
+    Path currentPath = new Path(new File(new Options().script).directorySync().path);
+    Path basePath = currentPath.append(args[0]).canonicalize();
+    String path = basePath.toNativePath();
+    print("Lauching Web Server, rendering files from $path");
+    startServer(path, args[1], int.parse(args[2], onError: (s) => 80));
     print("Server running...");
-  });
+  } else {
+    print("Please give the right arguments");
+    print("dart main.dart BASEPATH IP PORT");
+  }
 }
