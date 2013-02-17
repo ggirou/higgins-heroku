@@ -6,7 +6,7 @@
     "#" : "Listen for HTTP requests on the specified host",
     "host" : "0.0.0.0",
     "#" : "Listen for HTTP requests on the specified port",
-    "port" : $PORT,
+    "port" : "$PORT",
     "#" : "Base path for the default static file handler",
     "basePath" : "../web/web"
   },
